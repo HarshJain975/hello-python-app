@@ -1,7 +1,7 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app', '.']
-
+    
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app']
 
@@ -16,21 +16,27 @@ steps:
       - '--project'
       - 'atomic-segment-442210-n3'
 
-  - name: 'gcr.io/cloud-builders/kubectl'
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-private-cluster'
-    args: ['apply', '-f', 'deployment.yaml']
-
-  - name: 'gcr.io/cloud-builders/kubectl'
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-private-cluster'
-    args: ['apply', '-f', 'service.yaml']
+  # SSH into Bastion VM and run kubectl commands to apply deployment and service
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'compute'
+      - 'ssh'
+      - 'bastion-host'  # Replace with your Bastion VM name
+      - '--project'
+      - 'atomic-segment-442210-n3'
+      - '--zone'
+      - 'us-central1-a'  # Replace with your Bastion VM zone
+      - '--command'
+      - |
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
 
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy']
+    args:
+      - 'app'
+      - 'deploy'
 
 options:
   default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+
 
