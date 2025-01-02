@@ -1,17 +1,36 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['container', 'clusters', 'get-credentials', 'hello-private-cluster', '--zone', 'us-central1', '--project', 'atomic-segment-442210-n3']
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'deployment.yaml']
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'service.yaml']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app', '.']
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'container'
+      - 'clusters'
+      - 'get-credentials'
+      - 'hello-private-cluster'
+      - '--region'
+      - 'us-central1'  # Use the region instead of a zone
+      - '--project'
+      - 'atomic-segment-442210-n3'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-private-cluster'
+    args: ['apply', '-f', 'deployment.yaml']
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-private-cluster'
+    args: ['apply', '-f', 'service.yaml']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy']
 
 options:
   default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+
