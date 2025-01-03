@@ -41,17 +41,16 @@ steps:
     args:
       - '-c'
       - |
-        sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA|g" k8s/deployment.yaml
+        sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA|g" hello-python-app/k8s/deployment.yaml
 
   # Step 6: Apply the updated YAML files
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'apply'
       - '-f'
-      - 'k8s/deployment.yaml'
+      - 'hello-python-app/k8s/deployment.yaml'
       - '-f'
-      - 'k8s/service.yaml'
-    dir: 'hello-python-app'
+      - 'hello-python-app/k8s/service.yaml'
 
   # Step 7: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -66,3 +65,4 @@ images:
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
