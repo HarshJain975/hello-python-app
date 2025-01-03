@@ -30,6 +30,8 @@ steps:
       - 'us-central1-a'  # Zone where the Bastion VM is located
       - '--ssh-key-file=/builder/home/.ssh/google_compute_engine'
       - '--command="kubectl apply -f deployment.yaml && kubectl apply -f service.yaml"'
+      - 'gcpaccess266@bastion-host'  # Replace with the actual SSH user and Bastion VM instance name
+      - '--tunnel-through-iap'  # Use IAP tunneling if needed
 
   # Step 5: Deploy to Google App Engine (if needed)
   - name: 'gcr.io/cloud-builders/gcloud'
