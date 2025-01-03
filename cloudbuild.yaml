@@ -1,7 +1,6 @@
 substitutions:
   _CLUSTER_NAME: hello-python
   _REGION: us-central1
-  _ZONE: us-central1-a
 
 steps:
   # Step 1: Checkout the source code using Cloud Build source
@@ -38,30 +37,25 @@ steps:
       - '--region'
       - '${_REGION}'
 
-  # Step 5: Set necessary environment variables for kubectl and update the image in the deployment YAML file
+  # Step 5: Update the image in the deployment YAML file
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Setting environment variables for cluster..."
-        export CLOUDSDK_COMPUTE_REGION=${_REGION}
-        export CLOUDSDK_COMPUTE_ZONE=${_ZONE}  # If your cluster is zonal, set the zone, otherwise omit it
-        export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
-        
         echo "Checking for deployment.yaml..."
-        if [ -f hello-python-app/deployment.yaml ]; then
+        if [ -f hello-python-app/k8s/deployment.yaml ]; then
           echo "File found. Displaying contents:"
-          cat hello-python-app/deployment.yaml
+          cat hello-python-app/k8s/deployment.yaml
           echo "Updating image..."
-          sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:${SHORT_SHA}|g" hello-python-app/deployment.yaml || {
+          sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:${SHORT_SHA}|g" hello-python-app/k8s/deployment.yaml || {
             echo "Error: Failed to update image in deployment.yaml"
             exit 1
           }
           echo "Updated file contents:"
-          cat hello-python-app/deployment.yaml
+          cat hello-python-app/k8s/deployment.yaml
         else
-          echo "Error: File hello-python-app/deployment.yaml not found"
+          echo "Error: File hello-python-app/k8s/deployment.yaml not found"
           exit 1
         fi
 
@@ -70,9 +64,11 @@ steps:
     args:
       - 'apply'
       - '-f'
-      - 'hello-python-app/deployment.yaml'
+      - 'hello-python-app/k8s/deployment.yaml'
       - '-f'
-      - 'hello-python-app/service.yaml'
+      - 'hello-python-app/k8s/service.yaml'
+      - '--cluster=${_CLUSTER_NAME}'
+      - '--region=${_REGION}'
 
   # Step 7: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -81,6 +77,8 @@ steps:
       - 'status'
       - 'deployment/python-app'
       - '--namespace=default'
+      - '--cluster=${_CLUSTER_NAME}'
+      - '--region=${_REGION}'
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
