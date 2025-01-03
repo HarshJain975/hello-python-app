@@ -19,19 +19,16 @@ steps:
 
   # Step 4: Authenticate kubectl with GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
-    args:
-      - 'config'
-      - 'set'
-      - 'project'
-      - 'elite-flow-446700-k5'
-  - name: 'gcr.io/cloud-builders/gcloud'
+    env:
+      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-python'
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
     args:
       - 'container'
       - 'clusters'
       - 'get-credentials'
-      - 'hello-python'  # Replace with your GKE cluster name
+      - 'hello-python'
       - '--region'
-      - 'us-central1'  # Replace with your GKE cluster's region
+      - 'us-central1'
 
   # Step 5: Update the image in the deployment YAML file
   - name: 'gcr.io/cloud-builders/gcloud'
