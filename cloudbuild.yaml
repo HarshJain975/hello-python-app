@@ -2,7 +2,6 @@ steps:
   # Step 1: Checkout the source code using Cloud Build source
   - name: 'gcr.io/cloud-builders/git'
     args: ['clone', 'https://github.com/HarshJain975/hello-python-app.git']
-    dir: 'hello-python-app'
 
   # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -10,8 +9,7 @@ steps:
       - 'build'
       - '-t'
       - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
-      - '.'
-    dir: 'hello-python-app'
+      - './hello-python-app'
 
   # Step 3: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -65,4 +63,3 @@ images:
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
