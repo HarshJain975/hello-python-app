@@ -20,8 +20,8 @@ steps:
   # Step 4: Authenticate kubectl with GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
     env:
-      - 'CLOUDSDK_CONTAINER_CLUSTER=hello-python'
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'export CLOUDSDK_CONTAINER_CLUSTER=hello-python'
+      - 'export CLOUDSDK_COMPUTE_REGION=us-central1'
     args:
       - 'container'
       - 'clusters'
