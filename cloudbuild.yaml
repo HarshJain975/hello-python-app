@@ -17,29 +17,32 @@ steps:
       - 'push'
       - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
 
-  # Step 4: Deploy the Docker image to GKE
+  # Step 4: Authenticate kubectl with GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'container'
       - 'clusters'
       - 'get-credentials'
-      - 'hello-python'
+      - 'hello-python'           # Ensure the correct cluster name here
       - '--region'
-      - 'us-central1'
+      - 'us-central1'            # Ensure the correct region here
+
+  # Step 5: Update the image in the deployment to the newly built Docker image
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'set'
       - 'image'
       - 'deployment/python-app'
       - 'python-app=gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
+      # Optionally add --namespace=your-namespace if you're using a custom namespace
+
+  # Step 6: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'rollout'
       - 'status'
       - 'deployment/python-app'
+      # Optionally add --namespace=your-namespace if you're using a custom namespace
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
-
-options:
-  logging: CLOUD_LOGGING_ONLY
