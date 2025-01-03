@@ -53,7 +53,7 @@ steps:
             exit 1
           }
           echo "Updated file contents:"
-          cat hello-python-app/k8s/deployment.yaml
+          cat hello-python-app/deployment.yaml
         else
           echo "Error: File hello-python-app/deployment.yaml not found"
           exit 1
@@ -64,9 +64,9 @@ steps:
     args:
       - 'apply'
       - '-f'
-      - 'hello-python-app/k8s/deployment.yaml'
+      - 'hello-python-app/deployment.yaml'
       - '-f'
-      - 'hello-python-app/k8s/service.yaml'
+      - 'hello-python-app/service.yaml'
       - '--cluster=${_CLUSTER_NAME}'
       - '--region=${_REGION}'
 
