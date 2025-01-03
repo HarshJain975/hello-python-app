@@ -33,19 +33,24 @@ steps:
       - '--region'
       - 'us-central1'  # Replace with your GKE cluster's region
 
-    # Step 5: Update the image in the deployment YAML file
+  # Step 5: Update the image in the deployment YAML file
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
+        echo "Checking for deployment.yaml..."
         if [ -f hello-python-app/k8s/deployment.yaml ]; then
+          echo "File found. Displaying contents:"
+          cat hello-python-app/k8s/deployment.yaml
+          echo "Updating image..."
           sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA|g" hello-python-app/k8s/deployment.yaml
+          echo "Updated file contents:"
+          cat hello-python-app/k8s/deployment.yaml
         else
-          echo "File hello-python-app/k8s/deployment.yaml not found"
+          echo "Error: File hello-python-app/k8s/deployment.yaml not found"
           exit 1
         fi
-
 
   # Step 6: Apply the updated YAML files
   - name: 'gcr.io/cloud-builders/kubectl'
