@@ -59,7 +59,7 @@ steps:
           echo "Updated file contents:"
           cat hello-python-app/k8s/deployment.yaml
         else
-          echo "Error: File hello-python-app/k8s/deployment.yaml not found"
+          echo "Error: File hello-python-app/deployment.yaml not found"
           exit 1
         fi
 
@@ -72,7 +72,7 @@ steps:
         export CLOUDSDK_COMPUTE_REGION=${_REGION}
         export CLOUDSDK_COMPUTE_ZONE=${_ZONE}
         export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
-        kubectl apply -f hello-python-app/deployment.yaml -f hello-python-app/k8s/service.yaml
+        kubectl apply -f hello-python-app/deployment.yaml -f hello-python-app/service.yaml
 
   # Step 7: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
