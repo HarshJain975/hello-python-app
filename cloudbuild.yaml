@@ -1,7 +1,8 @@
 steps:
-  # Step 1: Checkout the source code
+  # Step 1: Checkout the source code using Cloud Build source
   - name: 'gcr.io/cloud-builders/git'
     args: ['clone', 'https://github.com/HarshJain975/hello-python-app.git']
+    dir: 'hello-python-app'
 
   # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -10,6 +11,7 @@ steps:
       - '-t'
       - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
       - '.'
+    dir: 'hello-python-app'
 
   # Step 3: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -23,33 +25,41 @@ steps:
       - 'config'
       - 'set'
       - 'project'
-      - 'elite-flow-446700-k5'  # Explicitly set project
+      - 'elite-flow-446700-k5'
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'container'
       - 'clusters'
       - 'get-credentials'
-      - 'hello-python'           # Ensure the correct cluster name here
+      - 'hello-python'  # Replace with your GKE cluster name
       - '--region'
-      - 'us-central1'            # Ensure the correct region here
+      - 'us-central1'  # Replace with your GKE cluster's region
 
-  # Step 5: Update the image in the deployment to the newly built Docker image
-  - name: 'gcr.io/cloud-builders/kubectl'
-    id: 'kubectl-set-image'   # Assigning an ID here
+  # Step 5: Update the image in the deployment YAML file
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     args:
-      - 'set'
-      - 'image'
-      - 'deployment/python-app'
-      - 'python-app=gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
-      - '--namespace=default'  # Adjust namespace if necessary
+      - '-c'
+      - |
+        sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA|g" k8s/deployment.yaml
 
-  # Step 6: Check rollout status to ensure the deployment is successful
+  # Step 6: Apply the updated YAML files
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'apply'
+      - '-f'
+      - 'k8s/deployment.yaml'
+      - '-f'
+      - 'k8s/service.yaml'
+    dir: 'hello-python-app'
+
+  # Step 7: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'rollout'
       - 'status'
       - 'deployment/python-app'
-      - '--namespace=default'  # Adjust namespace if necessary
+      - '--namespace=default'
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
