@@ -1,7 +1,7 @@
 steps:
   # Step 1: Checkout the source code using Cloud Build source
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', 'https://github.com/HarshJain975']
+    args: ['clone', 'https://github.com/HarshJain975/hello-python-app.git']
     dir: 'hello-python-app'
 
   # Step 2: Build the Docker image
