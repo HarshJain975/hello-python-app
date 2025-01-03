@@ -1,3 +1,7 @@
+substitutions:
+  _CLUSTER_NAME: hello-python
+  _REGION: us-central1
+
 steps:
   # Step 1: Checkout the source code using Cloud Build source
   - name: 'gcr.io/cloud-builders/git'
@@ -19,16 +23,13 @@ steps:
 
   # Step 4: Authenticate kubectl with GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
-    env:
-      - 'export CLOUDSDK_CONTAINER_CLUSTER=hello-python'
-      - 'export CLOUDSDK_COMPUTE_REGION=us-central1'
     args:
       - 'container'
       - 'clusters'
       - 'get-credentials'
-      - 'hello-python'
+      - '${_CLUSTER_NAME}'
       - '--region'
-      - 'us-central1'
+      - '${_REGION}'
 
   # Step 5: Update the image in the deployment YAML file
   - name: 'gcr.io/cloud-builders/gcloud'
