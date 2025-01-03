@@ -1,22 +1,13 @@
 steps:
-  # Build the Docker image
+  # Step 1: Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app', '.']
 
-  # Push the Docker image to Google Container Registry
+  # Step 2: Push Docker image to the registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/atomic-segment-442210-n3/hello-repo/hello-python-app']
 
-  # Set up an SSH tunnel to Bastion VM
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # SSH into Bastion VM and forward port 8080 (or other ports) to localhost
-        gcloud compute ssh bastion-host --zone us-central1-a --project atomic-segment-442210-n3 -- -N -L 8080:localhost:8080 &
-
-  # Get Kubernetes credentials through the Bastion VM (via SSH)
+  # Step 3: Get credentials for Kubernetes cluster
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'container'
@@ -24,21 +15,26 @@ steps:
       - 'get-credentials'
       - 'hello-private-cluster'
       - '--region'
-      - 'us-central1'
+      - 'us-central1'  # Use the region for the cluster
       - '--project'
       - 'atomic-segment-442210-n3'
 
-  # Apply the Kubernetes deployment YAML
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'deployment.yaml']
+  # Step 4: SSH into the Bastion VM and apply Kubernetes manifests
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'compute'
+      - 'ssh'
+      - '--project'
+      - 'atomic-segment-442210-n3'
+      - '--zone'
+      - 'us-central1-a'  # Zone where the Bastion VM is located
+      - '--ssh-key-file=/builder/home/.ssh/google_compute_engine'
+      - '--command="kubectl apply -f deployment.yaml && kubectl apply -f service.yaml"'
 
-  # Apply the Kubernetes service YAML
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'service.yaml']
-
-  # Deploy the App to App Engine (if needed)
+  # Step 5: Deploy to Google App Engine (if needed)
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['app', 'deploy']
 
 options:
   default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+
