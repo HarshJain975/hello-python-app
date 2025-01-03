@@ -1,6 +1,7 @@
 substitutions:
   _CLUSTER_NAME: hello-python
   _REGION: us-central1
+  _ZONE: us-central1-a
 
 steps:
   # Step 1: Checkout the source code using Cloud Build source
@@ -24,6 +25,12 @@ steps:
   # Step 4: Authenticate kubectl with GKE cluster
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
+      - 'config'
+      - 'set'
+      - 'project'
+      - 'elite-flow-446700-k5'
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
       - 'container'
       - 'clusters'
       - 'get-credentials'
@@ -31,12 +38,17 @@ steps:
       - '--region'
       - '${_REGION}'
 
-  # Step 5: Update the image in the deployment YAML file
+  # Step 5: Set necessary environment variables for kubectl and update the image in the deployment YAML file
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
+        echo "Setting environment variables for cluster..."
+        export CLOUDSDK_COMPUTE_REGION=${_REGION}
+        export CLOUDSDK_COMPUTE_ZONE=${_ZONE}  # If your cluster is zonal, set the zone, otherwise omit it
+        export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
+        
         echo "Checking for deployment.yaml..."
         if [ -f hello-python-app/deployment.yaml ]; then
           echo "File found. Displaying contents:"
