@@ -48,18 +48,18 @@ steps:
         export CLOUDSDK_COMPUTE_ZONE=${_ZONE}
         export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
         echo "Checking for deployment.yaml..."
-        if [ -f hello-python-app/deployment.yaml ]; then
+        if [ -f hello-python-app/k8s/deployment.yaml ]; then
           echo "File found. Displaying contents:"
-          cat hello-python-app/deployment.yaml
+          cat hello-python-app/k8s/deployment.yaml
           echo "Updating image..."
-          sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:${SHORT_SHA}|g" hello-python-app/deployment.yaml || {
+          sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:${SHORT_SHA}|g" hello-python-app/k8s/deployment.yaml || {
             echo "Error: Failed to update image in deployment.yaml"
             exit 1
           }
           echo "Updated file contents:"
-          cat hello-python-app/deployment.yaml
+          cat hello-python-app/k8s/deployment.yaml
         else
-          echo "Error: File hello-python-app/deployment.yaml not found"
+          echo "Error: File hello-python-app/k8s/deployment.yaml not found"
           exit 1
         fi
 
@@ -72,20 +72,15 @@ steps:
         export CLOUDSDK_COMPUTE_REGION=${_REGION}
         export CLOUDSDK_COMPUTE_ZONE=${_ZONE}
         export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
-        kubectl apply -f hello-python-app/deployment.yaml -f hello-python-app/service.yaml
+        kubectl apply -f hello-python-app/k8s/deployment.yaml -f hello-python-app/k8s/service.yaml
 
   # Step 7: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
-      - '-c'
-      - |
-        export CLOUDSDK_COMPUTE_REGION=${_REGION}
-        export CLOUDSDK_COMPUTE_ZONE=${_ZONE}
-        export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}      
-        - 'rollout'
-        - 'status'
-        - 'deployment/python-app'
-        - '--namespace=default'
+      - 'rollout'
+      - 'status'
+      - 'deployment/python-app'
+      - '--namespace=default'
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
