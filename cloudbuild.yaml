@@ -46,3 +46,6 @@ steps:
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
+
+options:
+  logging: REGIONAL_USER_OWNED_BUCKET
