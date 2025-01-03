@@ -57,7 +57,7 @@ steps:
             exit 1
           }
           echo "Updated file contents:"
-          cat hello-python-app/k8s/deployment.yaml
+          cat hello-python-app/deployment.yaml
         else
           echo "Error: File hello-python-app/deployment.yaml not found"
           exit 1
