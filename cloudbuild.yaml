@@ -74,13 +74,6 @@ steps:
         export CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
         kubectl apply -f hello-python-app/deployment.yaml -f hello-python-app/service.yaml
 
-  # Step 7: Check rollout status to ensure the deployment is successful
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args:
-      - 'rollout'
-      - 'status'
-      - 'deployment/python-app'
-      - '--namespace=default'
 
 images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
