@@ -35,21 +35,13 @@ steps:
 
   # Step 5: Update the image in the deployment to the newly built Docker image
   - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'kubectl-set-image'   # Assigning an ID here
     args:
       - 'set'
       - 'image'
       - 'deployment/python-app'
       - 'python-app=gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
       - '--namespace=default'  # Adjust namespace if necessary
-
-  # Debug step to check deployment status and logs
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args:
-      - 'get'
-      - 'deployment'
-      - 'python-app'
-      - '--namespace=default'  # Adjust namespace if necessary
-    waitFor: ['kubectl-set-image']
 
   # Step 6: Check rollout status to ensure the deployment is successful
   - name: 'gcr.io/cloud-builders/kubectl'
