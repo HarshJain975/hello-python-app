@@ -48,5 +48,4 @@ images:
   - 'gcr.io/elite-flow-446700-k5/python-app:$SHORT_SHA'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
-
+  logging: CLOUD_LOGGING_ONLY  # Set logging to Cloud Logging only
