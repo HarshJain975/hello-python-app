@@ -50,7 +50,7 @@ steps:
         echo "Checking for deployment.yaml..."
         if [ -f hello-python-app/deployment.yaml ]; then
           echo "File found. Displaying contents:"
-          cat hello-python-app/k8s/deployment.yaml
+          cat hello-python-app/deployment.yaml
           echo "Updating image..."
           sed -i "s|image:.*|image: gcr.io/elite-flow-446700-k5/python-app:${SHORT_SHA}|g" hello-python-app/deployment.yaml || {
             echo "Error: Failed to update image in deployment.yaml"
